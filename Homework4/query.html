@@ -1,0 +1,189 @@
+<html>
+<head>
+<style>
+    
+body {
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	font: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+}
+
+</style>
+<script type="text/javascript">
+	var xmlDoc; 
+    function myFunction(){
+		
+        var url = document.getElementById("inputurl").value;
+        if ( url == "" ){
+            alert("Enter value in text box");  
+            return;
+        }
+        
+		loadXML(url);
+        
+            
+        
+        if (xmlDoc == null){
+             alert("No Station Data found in XML");            
+        }else{
+           
+
+		//Header
+		var header = xmlDoc.getElementsByTagName("Header");
+		var headerData = header[0].getElementsByTagName("Data");        
+        var table = document.createElement("table");
+		table.setAttribute("border","1");		
+        table.setAttribute("align","center");
+        table.setAttribute("id","table");
+		var tr = document.createElement("tr");
+		table.appendChild(tr);
+		for (var j=0; j < headerData.length; j++)
+		{
+			var td = document.createElement("td");
+            td.setAttribute("style", "font-weight: bold; text-align: center");
+			tr.appendChild(td);
+			var text = document.createTextNode(headerData[j].firstChild.data);
+			td.appendChild(text);	
+		}
+        
+        //Row Datas
+		var row = xmlDoc.getElementsByTagName("Row");
+        
+        if (row.length == 0){
+             alert("No Station Data found in XML");            
+            }else{
+                for (var j=0; j < row.length; j++)
+		        {
+                    var tr = document.createElement("tr");
+			        table.appendChild(tr);
+			    
+                    //Column1 - CallSign
+                    var td = document.createElement("td");
+			        tr.appendChild(td);
+			        var nodeValue = row[j].getElementsByTagName("CallSign");
+			        if (nodeValue[0].firstChild != null){
+				        var text = document.createTextNode(nodeValue[0].firstChild.data);			
+			         }else{
+				        var text = 	document.createTextNode("N.A");
+			         }
+			         td.appendChild(text);
+                
+			        //Column 2 - Frequency 
+                    var td = document.createElement("td");
+			         tr.appendChild(td);	
+			         var nodeValue = row[j].getElementsByTagName("Frequency");  
+                     if (nodeValue[0].firstChild != null){
+                        var text = document.createTextNode(nodeValue[0].firstChild.data);
+                     }else{
+				        var text = 	document.createTextNode("N.A");
+                     }
+			         td.appendChild(text);
+            
+                     //Column 3 - Location
+                     var td = document.createElement("td");
+                     tr.appendChild(td);			
+			         var ul = document.createElement("ul");
+			         td.appendChild(ul);
+                     var nodeValue = row[j].getElementsByTagName("Location");
+                     for(var i = 0; i < (nodeValue[0].children.length); i++){   
+                        var li = document.createElement("li");
+			            ul.appendChild(li);			
+                        var text = document.createTextNode(nodeValue[0].children[i].firstChild.data);			
+                        li.appendChild(text);                
+                    }
+			        
+                    //Column 4 - Format
+                    var td = document.createElement("td");
+			        tr.appendChild(td);
+                    var nodeValue = row[j].getElementsByTagName("Format");
+                    if (nodeValue[0].firstChild != null){
+				        var text = document.createTextNode(nodeValue[0].firstChild.data);			
+			        }else{
+				        var text = 	document.createTextNode("N.A");
+			        }
+			        td.appendChild(text);
+			        
+                    
+                    //Column 4 - HomePage
+                    var td = document.createElement("td");
+			        tr.appendChild(td);			
+			        var a = document.createElement("a");
+			        td.appendChild(a);
+                    var nodeValue = row[j].getElementsByTagName("HomePage");
+                    if (nodeValue[0].firstChild != null){
+				        var text = nodeValue[0].firstChild.data;			
+			        }else{
+				        var text = 	"N.A";
+			        }		
+			        a.setAttribute("href",text);
+			        a.innerHTML = text;
+            			
+			        //Column 4 - Logo
+                    var td = document.createElement("td");
+			        tr.appendChild(td);
+			        var img = document.createElement("IMG");
+			        td.appendChild(img);    
+			        var nodeValue = row[j].getElementsByTagName("Logo");            
+                    if (nodeValue[0].firstChild != null){
+                        var text = nodeValue[0].firstChild.data;			
+                    }else{
+				        var text = 	"N.A";
+                    }			
+			        img.setAttribute("src", text);
+            	
+		      }	     
+            
+            
+                
+                var div = document.getElementById("table");
+                if (div) {
+                    div.parentNode.removeChild(div);
+                }
+                var tablediv = document.getElementById("tablediv");
+                tablediv.appendChild(table);
+                var myWindow = window.open("", "_self");
+                myWindow.document.write(tablediv);
+                
+        }
+		
+	}
+    }
+
+    //Load XML data
+	function loadXML(url){
+	if (window.XMLHttpRequest){           
+		xmlhttp=new XMLHttpRequest();    
+	}  
+	else{      
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");   
+	}   
+	xmlhttp.open("GET",url,false); 
+	xmlhttp.send();         
+	xmlDoc=xmlhttp.responseXML;   
+	return xmlDoc;  
+    } 
+</script>
+<title>XML Parser</title>
+</head>
+<body>
+<br>
+<br>
+<br>
+<br>
+Enter URL for Company List XML File
+<br>
+<br>
+<br>
+<input type="text" value="stationslist.xml" id="inputurl"></input>
+<br>
+<br>
+<br>
+<input type="button" id = "querybtn" value="Submit Query" onclick="myFunction()"></input>
+<br>
+<br>
+<br>
+<div id = "tablediv"></div>
+</body>
+<html>
